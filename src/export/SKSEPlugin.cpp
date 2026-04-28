@@ -40,7 +40,9 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
 		v.PluginName(Plugin::NAME);
 		v.AuthorName("SeaSparrow"sv);
 		v.UsesAddressLibrary();
+#ifndef SKYRIMVR
 		v.UsesUpdatedStructs();
+#endif
 
 		return v;
 	}();
@@ -57,9 +59,15 @@ SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 	}
 
 	const auto ver = a_skse->RuntimeVersion();
+#ifdef SKYRIMVR
+	if (ver < SKSE::RUNTIME_VR_1_4_15_1) {
+		return false;
+	}
+#else
 	if (ver < SKSE::RUNTIME_1_6_1130) {
 		return false;
 	}
+#endif
 
 	return true;
 }
@@ -89,9 +97,15 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	SKSE::Init(a_skse);
 
 	const auto ver = a_skse->RuntimeVersion();
+#ifdef SKYRIMVR
+	if (ver < SKSE::RUNTIME_VR_1_4_15_1) {
+		return false;
+	}
+#else
 	if (ver < SKSE::RUNTIME_1_6_1130) {
 		return false;
 	}
+#endif
 
 	logger::info("Performing startup tasks..."sv);
 	if (!Settings::INI::Holder::GetSingleton()->Read()) {

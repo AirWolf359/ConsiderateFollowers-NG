@@ -50,6 +50,19 @@
       }
     },
     {
+      "name": "vr-release",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build-vr"
+    },
+    {
+      "name": "vr-test",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build-vr-test",
+      "cacheVariables": {
+        "BUILD_TEST": true
+      }
+    },
+    {
       "name": "vs2022-windows-vcpkg-release",
       "inherits": [
         "cmake-dev",
@@ -71,6 +84,33 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr-release",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "vr-release"
+      ],
+      "cacheVariables": {
+        "BUILD_SKYRIMVR": true
+      }
+    },
+    {
+      "name": "vs2022-windows-vcpkg-vr-test",
+      "inherits": [
+        "cmake-dev",
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "vr-test"
+      ],
+      "cacheVariables": {
+        "BUILD_SKYRIMVR": true,
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ],
   "buildPresets": [
@@ -82,6 +122,16 @@
     {
       "name": "Test",
       "configurePreset": "vs2022-windows-vcpkg-test",
+      "configuration": "Debug"
+    },
+    {
+      "name": "VR-Release",
+      "configurePreset": "vs2022-windows-vcpkg-vr-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "VR-Test",
+      "configurePreset": "vs2022-windows-vcpkg-vr-test",
       "configuration": "Debug"
     }
   ]

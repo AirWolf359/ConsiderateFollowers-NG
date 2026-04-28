@@ -17,9 +17,9 @@ list(APPEND CMAKE_MODULE_PATH
 )
 include(SKSEPlugin)
 set(SKSE_USE_XBYAK ON)
+set(SKSE_SUPPORT_VR ON)
+set(SKSE_COMMONLIBSSE_PATH "External/CommonLibSSE")
 
-add_compile_definitions(SKYRIM_AE)
-add_compile_definitions(SKYRIM_SUPPORT_AE)
 add_compile_definitions(SKSE_SUPPORT_XBYAK)
 
 if (BUILD_TEST)

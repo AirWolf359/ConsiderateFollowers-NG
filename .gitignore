@@ -6,5 +6,7 @@
 /build
 /build-ng
 /build-test
+/build-vr
+/build-vr-test
 /.vscode
 /.codegraph
