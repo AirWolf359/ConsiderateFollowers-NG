@@ -6,3 +6,5 @@
 /build
 /build-ng
 /build-test
+/.vscode
+/.codegraph
