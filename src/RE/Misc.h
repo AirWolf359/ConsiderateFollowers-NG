@@ -5,28 +5,10 @@
 namespace RE
 {
 
-	inline void ClearGreetingInfoData(AIProcess* a_this) {
-		using func_t = decltype(&ClearGreetingInfoData);
-		static REL::Relocation<func_t> func{ Offset::AIProcess::ClearGreetingInfoData };
-		func(a_this);
-	}
-
 	inline bool PlayerIsSleepingOrResting(PlayerCharacter* a_player) {
 		using func_t = decltype(&PlayerIsSleepingOrResting);
 		static REL::Relocation<func_t> func{ RE::Offset::PlayerCharacter::GetSleepRestState };
 		return func(a_player);
-	}
-
-	inline bool GetCharacterEssential(Character* a_character) {
-		using func_t = decltype(&GetCharacterEssential);
-		static REL::Relocation<func_t> func{ RE::Offset::Character::GetEssential };
-		return func(a_character);
-	}
-
-	inline RE::PROCESS_TYPE GetCharacterProcessLevel(Character* a_character) {
-		using func_t = decltype(&GetCharacterProcessLevel);
-		static REL::Relocation<func_t> func{ RE::Offset::Character::GetProccess };
-		return func(a_character);
 	}
 
 	inline bool IsTalking(Character* a_character)

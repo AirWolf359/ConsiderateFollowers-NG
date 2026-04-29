@@ -23,8 +23,8 @@ namespace DialogueManager
 		}
 
 		auto process = a_storedCharacter->currentProcess;
-		if (!process || 
-			RE::GetCharacterProcessLevel(a_storedCharacter) == RE::PROCESS_TYPE::kNone)
+		if (!process ||
+			process->processLevel.get() == RE::PROCESS_TYPE::kNone)
 		{
 			preserve = false;
 			return false;
