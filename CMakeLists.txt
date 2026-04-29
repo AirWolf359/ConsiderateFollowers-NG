@@ -19,6 +19,7 @@ include(SKSEPlugin)
 set(SKSE_USE_XBYAK ON)
 set(SKSE_SUPPORT_VR ON)
 set(SKSE_COMMONLIBSSE_PATH "External/CommonLibSSE")
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 add_compile_definitions(SKSE_SUPPORT_XBYAK)
 
