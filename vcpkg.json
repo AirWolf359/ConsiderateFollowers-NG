@@ -11,7 +11,8 @@
     "clib-util",
     "jsoncpp",
     "simpleini",
-    "xbyak"
+    "xbyak",
+    "rapidcsv"
   ],
   "builtin-baseline": "ea295dff0b3e9e9caeb49d1225dc7272d3231cf1"
 }
