@@ -1,6 +1,7 @@
 #include "Hooks/hooks.h"
 
 #include "DialogueManager/DialogueManager.h"
+#include "RE/Offset.h"
 
 namespace Hooks {
 	bool Install()
@@ -35,7 +36,7 @@ namespace Hooks {
 	{
 		auto& trampoline = SKSE::GetTrampoline();
 
-		REL::Relocation<std::uintptr_t> target{ REL::ID(25541), 0xE2 };
+		REL::Relocation<std::uintptr_t> target{ RE::Offset::TESTopic::CreateDialogueItem, 0xE2 };
 		if (!REL::make_pattern<"E8">().match(target.address())) {
 			logger::critical("  >Failed to match pattern for 25541 + 0xE2."sv);
 			return false;
