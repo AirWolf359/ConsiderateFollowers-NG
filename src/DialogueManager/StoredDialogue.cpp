@@ -9,7 +9,7 @@ namespace DialogueManager
 			preserve = false;
 		}
 
-		auto lifeState = a_storedCharacter->GetLifeState();
+		auto lifeState = a_storedCharacter->AsActorState()->GetLifeState();
 		switch (lifeState) {
 		case RE::ACTOR_LIFE_STATE::kDying:
 		case RE::ACTOR_LIFE_STATE::kDead:
