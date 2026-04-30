@@ -40,9 +40,6 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
 		v.PluginName(Plugin::NAME);
 		v.AuthorName("SeaSparrow"sv);
 		v.UsesAddressLibrary();
-#ifndef SKYRIMVR
-		v.UsesUpdatedStructs();
-#endif
 
 		return v;
 	}();
@@ -60,11 +57,11 @@ SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 
 	const auto ver = a_skse->RuntimeVersion();
 #ifdef SKYRIMVR
-	if (ver < SKSE::RUNTIME_VR_1_4_15_1) {
+	if (ver < SKSE::RUNTIME_VR_1_4_15) {
 		return false;
 	}
 #else
-	if (ver < SKSE::RUNTIME_1_6_1130) {
+	if (ver < REL::Version(1, 6, 1130, 0)) { // no named constant in CommonLibSSE-NG; RUNTIME_SSE_1_6_1330 appears bugged (value is 1.5.1330)
 		return false;
 	}
 #endif
@@ -98,11 +95,11 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	const auto ver = a_skse->RuntimeVersion();
 #ifdef SKYRIMVR
-	if (ver < SKSE::RUNTIME_VR_1_4_15_1) {
+	if (ver < SKSE::RUNTIME_VR_1_4_15) {
 		return false;
 	}
 #else
-	if (ver < SKSE::RUNTIME_1_6_1130) {
+	if (ver < REL::Version(1, 6, 1130, 0)) { // no named constant in CommonLibSSE-NG; RUNTIME_SSE_1_6_1330 is bugged (value is 1.5.1330)
 		return false;
 	}
 #endif

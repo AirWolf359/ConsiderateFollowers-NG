@@ -90,9 +90,9 @@ namespace DialogueManager
 			return;
 		}
 		
-		auto distance = player->GetDistance(oldSpeaker);
+		auto distance = player->GetPosition().GetDistance(oldSpeaker->GetPosition());
 		if (distance > maximumDistance ||
-			distance > player->GetDistance(a_speaker)) {
+			distance > player->GetPosition().GetDistance(a_speaker->GetPosition())) {
 			closestSpeakerID = a_speaker->GetFormID();
 		}
 	}
@@ -200,7 +200,7 @@ namespace DialogueManager
 		}
 
 		bool talking = RE::IsTalking(closestSpeaker);
-		float speakerDistance = talking ? closestSpeaker->GetDistance(player) : 5000.0f;
+		float speakerDistance = talking ? closestSpeaker->GetPosition().GetDistance(player->GetPosition()) : 5000.0f;
 		if (speakerDistance > maximumDistance) {
 			return false;
 		}

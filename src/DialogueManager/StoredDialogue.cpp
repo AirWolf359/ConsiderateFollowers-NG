@@ -9,7 +9,7 @@ namespace DialogueManager
 			preserve = false;
 		}
 
-		auto lifeState = a_storedCharacter->actorState1.lifeState;
+		auto lifeState = a_storedCharacter->GetLifeState();
 		switch (lifeState) {
 		case RE::ACTOR_LIFE_STATE::kDying:
 		case RE::ACTOR_LIFE_STATE::kDead:
@@ -22,7 +22,7 @@ namespace DialogueManager
 			break;
 		}
 
-		auto process = a_storedCharacter->currentProcess;
+		auto process = a_storedCharacter->GetActorRuntimeData().currentProcess;
 		if (!process ||
 			process->processLevel.get() == RE::PROCESS_TYPE::kNone)
 		{
@@ -63,7 +63,7 @@ namespace DialogueManager
 			}
 		}
 		else {
-			RE::AIProcessProccessGreet(internalCharacter->currentProcess, internalCharacter, topic);
+			RE::AIProcessProccessGreet(internalCharacter->GetActorRuntimeData().currentProcess, internalCharacter, topic);
 		}
 		preserve = false;
 	}
