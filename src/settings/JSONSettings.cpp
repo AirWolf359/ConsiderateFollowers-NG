@@ -140,6 +140,11 @@ namespace Settings::JSON
 			return false;
 		}
 
+		if (!std::filesystem::exists(jsonFolder)) {
+			logger::info("No settings folder found, skipping JSON config."sv);
+			return true;
+		}
+
 		std::vector<std::string> paths{};
 		try {
 			for (const auto& entry : std::filesystem::directory_iterator(jsonFolder)) {
@@ -156,7 +161,7 @@ namespace Settings::JSON
 			return false;
 		}
 		if (paths.empty()) {
-			logger::info("No settings found");
+			logger::info("No settings found"sv);
 			return true;
 		}
 
