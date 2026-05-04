@@ -198,15 +198,15 @@ namespace DialogueManager
 		bool found = false;
 		processList->ForAllActors([&](RE::Actor* actor) {
 			if (actor == a_excluded || !actor->IsPlayerTeammate()) {
-				return BSContainer::ForEachResult::kContinue;
+				return RE::BSContainer::ForEachResult::kContinue;
 			}
 			auto* character = actor->As<RE::Character>();
 			if (character && RE::IsTalking(character) &&
 				actor->GetPosition().GetDistance(player->GetPosition()) <= maximumDistance) {
 				found = true;
-				return BSContainer::ForEachResult::kStop;
+				return RE::BSContainer::ForEachResult::kStop;
 			}
-			return BSContainer::ForEachResult::kContinue;
+			return RE::BSContainer::ForEachResult::kContinue;
 		});
 		return found;
 	}
