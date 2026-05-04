@@ -57,7 +57,7 @@ namespace DialogueManager
 		auto dialogueTarget = dialogueManager ? dialogueManager->speaker.get() : nullptr;
 		auto* dialogueActor = dialogueTarget && dialogueTarget.get() ? dialogueTarget->As<RE::Actor>() : nullptr;
 		bool isDialogueTarget = dialogueTarget ? dialogueActor == a_speaker : false;
-		if ((dialogueActor && !isDialogueTarget) || IsClosestActorSpeaking()) {
+		if ((dialogueActor && !isDialogueTarget) || IsAnyFollowerSpeaking(a_speaker)) {
 			auto witheldDialogue = StoredDialogue(a_speaker, a_topic);
 			if (witheldDialogue.Preserve()) {
 				pendingDialogue.push_back(witheldDialogue);
@@ -186,6 +186,29 @@ namespace DialogueManager
 		}
 		queued = true;
 		interface->AddTask(tasklet);
+	}
+
+	bool Manager::IsAnyFollowerSpeaking(RE::Actor* a_excluded) const {
+		auto* processList = RE::ProcessLists::GetSingleton();
+		auto* player = RE::PlayerCharacter::GetSingleton();
+		if (!processList || !player) {
+			return false;
+		}
+
+		bool found = false;
+		processList->ForAllActors([&](RE::Actor* actor) {
+			if (actor == a_excluded || !actor->IsPlayerTeammate()) {
+				return BSContainer::ForEachResult::kContinue;
+			}
+			auto* character = actor->As<RE::Character>();
+			if (character && RE::IsTalking(character) &&
+				actor->GetPosition().GetDistance(player->GetPosition()) <= maximumDistance) {
+				found = true;
+				return BSContainer::ForEachResult::kStop;
+			}
+			return BSContainer::ForEachResult::kContinue;
+		});
+		return found;
 	}
 
 	bool Manager::IsClosestActorSpeaking() const {

@@ -23,6 +23,7 @@ namespace DialogueManager
 
 	private:
 		bool IsClosestActorSpeaking() const;
+		bool IsAnyFollowerSpeaking(RE::Actor* a_excluded) const;
 
 		std::unordered_set<const RE::TESNPC*> whitelistedNPCs{};
 		std::vector<StoredDialogue>           pendingDialogue;
