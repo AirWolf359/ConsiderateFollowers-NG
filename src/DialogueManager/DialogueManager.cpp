@@ -104,15 +104,6 @@ namespace DialogueManager
 			return false;
 		}
 
-		auto preventPileUpRaw = iniManager->GetStoredSetting<bool>(iniManager->PREVENT_PILEUP_SETTING);
-		if (!preventPileUpRaw.has_value()) {
-			logger::error("  >Setting {} not found in INI settings, treating as false."sv, iniManager->PREVENT_PILEUP_SETTING);
-			preventPileUp = false;
-		}
-		else {
-			preventPileUp = preventPileUpRaw.value();
-		}
-
 		auto maxSpeakerDistanceRaw = iniManager->GetStoredSetting<float>(iniManager->MAX_DISTANCE_SETTING);
 		if (!maxSpeakerDistanceRaw.has_value()) {
 			logger::error("  >Setting {} not found in INI settings, treating as 500.0."sv, iniManager->MAX_DISTANCE_SETTING);

@@ -11,7 +11,6 @@ namespace Settings
 			bool Read();
 
 			std::string MAX_DISTANCE_SETTING{ "General|fMaxConversationDistance" };
-			std::string PREVENT_PILEUP_SETTING{ "General|bPreventFollowerPileup" };
 
 			template <typename T>
 			std::optional<T> GetStoredSetting(std::string a_settingName) {

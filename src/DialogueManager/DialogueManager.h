@@ -30,7 +30,6 @@ namespace DialogueManager
 		RE::FormID                            closestSpeakerID{ 0 };
 
 		bool  queued{ false };
-		bool  preventPileUp{ false };
 		float maximumDistance{ 0.0f };
 	};
 }
