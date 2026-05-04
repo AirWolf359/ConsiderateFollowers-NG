@@ -17,16 +17,12 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        target: [SE_AE, VR]
+        target: [SE_AE]
         include:
           - target: SE_AE
             preset: vs2022-windows-vcpkg-release
             build_dir: build
             artifact: ConsiderateFollowers-SE-AE
-          - target: VR
-            preset: vs2022-windows-vcpkg-vr-release
-            build_dir: build-vr
-            artifact: ConsiderateFollowers-VR
 
     steps:
     - uses: actions/checkout@v4
