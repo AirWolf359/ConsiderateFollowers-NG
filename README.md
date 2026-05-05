@@ -33,12 +33,12 @@ This version also suppresses follower idle dialogue when another follower is alr
 VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. This ID is absent from the VR address library CSV, and the correct raw memory offset for this function in `SkyrimVR.exe` has not been determined.
 
 **What is known:**
-- The VR address library maps ID 25541 to `0x3B8720` (image-relative). However, the function at that address in the VR binary is only 66 bytes — too short to contain the hook point used in SE/AE (`+0xE2`).
-- The SE/AE hook patches a `CALL` instruction at `CreateDialogueItem + 0xE2`. Even if the correct VR address for `CreateDialogueItem` is found, the equivalent `CALL` offset within that function may differ in VR.
-- Static analysis of the VR binary via Ghidra has not been productive for this function.
+- Five of the six required VR function addresses have been sourced from the [VR address library CSV](https://github.com/alandtse/skyrim_vr_address_library) and confirmed as valid function starts in Ghidra. One (`AIProcess::ProcessGreet`, ID 39162) maps to a mid-function address and still needs runtime verification.
+- `CreateDialogueItem` (ID 25541) is confirmed at VR image-relative offset `0x3B8720`. However, the function at that address is only 66 bytes — far too short to contain the hook point used in SE/AE (`+0xE2`).
+- The SE/AE hook patches a `CALL` instruction at `CreateDialogueItem + 0xE2`. In VR, the equivalent `CALL` to the `DialogueItem` constructor either occurs at a different offset or has been compiled away entirely. The VR version of this function appears to be structured very differently from SE/AE.
 
 **What is needed:**
-Runtime debugging (e.g. x64dbg attached to a live `SkyrimVR.exe` process) to locate `CreateDialogueItem` and identify the `CALL` to the `DialogueItem` constructor within it. If you have experience with VR binary analysis or know where this information can be found, please open an issue or get in touch.
+Runtime debugging (e.g. x64dbg attached to a live `SkyrimVR.exe` process) to find where the `DialogueItem` constructor is called in the VR version of `CreateDialogueItem`, and to verify the `AIProcess::ProcessGreet` address. If you have experience with VR binary analysis or know where this information can be found, please open an issue or get in touch.
 
 ## INI Settings
 
