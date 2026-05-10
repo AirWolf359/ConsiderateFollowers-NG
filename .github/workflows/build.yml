@@ -8,26 +8,22 @@ on:
   workflow_dispatch:
 
 env:
-  BUILD_TYPE: Release
   VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
   VCPKG_ROOT: C:\vcpkg
 
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        target: [SE_AE]
-        include:
-          - target: SE_AE
-            preset: vs2022-windows-vcpkg-release
-            build_dir: build
-            artifact: ConsiderateFollowers-SE-AE
 
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    - name: Setup MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
 
     - name: Setup vcpkg
       run: |
@@ -39,27 +35,23 @@ jobs:
     - name: Cache vcpkg
       uses: actions/cache@v4
       id: vcpkg-cache
-      env:
-        cache-name: vcpkg-cache
       with:
         path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.target }}-${{ hashFiles('main/**/vcpkg.json', 'vcpkg-version.txt') }}
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-version.txt') }}
 
     - name: Configure CMake
-      run: |
-        cmake --preset ${{ matrix.preset }} -Wno-deprecated
+      run: cmake --preset build-release-msvc
 
     - name: Build
-      run: |
-        cmake --build ${{ github.workspace }}/${{ matrix.build_dir }} --config ${{ env.BUILD_TYPE }}
+      run: cmake --build --preset release-msvc
 
     - name: Install
       run: |
-        cmake --install ${{ github.workspace }}/${{ matrix.build_dir }} --component "components" --config ${{ env.BUILD_TYPE }} --prefix ${{ github.workspace }}/ReleaseBuild
-        cmake --install ${{ github.workspace }}/${{ matrix.build_dir }} --component "SKSEPlugin" --config ${{ env.BUILD_TYPE }} --prefix ${{ github.workspace }}/ReleaseBuild
+        cmake --install ${{ github.workspace }}/build/release-msvc --component "components" --prefix ${{ github.workspace }}/ReleaseBuild
+        cmake --install ${{ github.workspace }}/build/release-msvc --component "SKSEPlugin" --prefix ${{ github.workspace }}/ReleaseBuild
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.artifact }}
+        name: ConsiderateFollowers-AE
         path: ${{ github.workspace }}/ReleaseBuild

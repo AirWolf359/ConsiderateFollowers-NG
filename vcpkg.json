@@ -1,18 +1,22 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "consideratefollowers",
-  "version-string": "1.0.0",
-  "description": "General gameplay improvements for Skyrim SE - Followers won't talk over our current dialogue target.",
-  "homepage": "",
-  "license": "MIT",
+  "version-semver": "1.0.0",
   "dependencies": [
-    "fmt",
-    "rsm-binary-io",
-    "spdlog",
-    "clib-util",
+    { "name": "directxmath", "version>=": "2025-04-03" },
+    { "name": "directxtk", "version>=": "2025-10-27" },
+    { "name": "fmt", "version>=": "12.1.0" },
     "jsoncpp",
+    { "name": "rapidcsv", "version>=": "8.90" },
     "simpleini",
-    "xbyak",
-    "rapidcsv"
+    { "name": "spdlog", "version>=": "1.16.0" },
+    { "name": "xbyak", "version>=": "7.28" }
   ],
-  "builtin-baseline": "ea295dff0b3e9e9caeb49d1225dc7272d3231cf1"
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "git",
+      "repository": "https://github.com/microsoft/vcpkg",
+      "baseline": "ee12231b20c95013c6638d845d04c91559a1d1ff"
+    }
+  }
 }

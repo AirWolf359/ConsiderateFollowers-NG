@@ -127,8 +127,7 @@ namespace Settings::INI
 		};
 
 		const StoredSetting expectedSettings[] = {
-			{"General", "fMaxConversationDistance"},
-			{"General", "bPreventFollowerPileup"}
+			{"General", "fMaxConversationDistance"}
 		};
 
 		logger::info("Verifying INI settings..."sv);
