@@ -30,11 +30,11 @@ This version also suppresses follower idle dialogue when another follower is alr
 
 ## VR Support
 
-VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. The function address has been located in the VR binary, but the hook point cannot be used.
+VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. **ID 25541 is absent from the VR address library CSV**, so there is no library-provided mapping for this function in VR.
 
 **What is known:**
 - Five of the six required VR function addresses have been sourced from the [VR address library CSV](https://github.com/alandtse/skyrim_vr_address_library) and confirmed as valid function starts in Ghidra. One (`AIProcess::ProcessGreet`, ID 39162) maps to a mid-function address and still needs runtime verification.
-- `CreateDialogueItem` (ID 25541) is confirmed at VR image-relative offset `0x3B8720`. However, the function at that address is only 66 bytes — far too short to contain the hook point used in SE/AE (`+0xE2`).
+- A candidate address for `CreateDialogueItem` in `SkyrimVR.exe` (`0x3B8720`) was located by searching the binary directly, but the function at that address is only 66 bytes — far too short to contain the hook point used in SE/AE (`+0xE2`).
 - The SE/AE hook patches a `CALL` instruction at `CreateDialogueItem + 0xE2`. In VR, the equivalent `CALL` to the `DialogueItem` constructor either occurs at a different offset or has been compiled away entirely. The VR version of this function appears to be structured very differently from SE/AE.
 
 **What is needed:**
