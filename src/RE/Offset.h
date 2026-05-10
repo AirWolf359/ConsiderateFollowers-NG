@@ -28,9 +28,9 @@ namespace RE
 
 		namespace TESTopic
 		{
-			// SE: 0x3A8BB0, AE 1.6.1179: 0x3E82A0 — hook at +0xE2 targets the DialogueItem ctor call
+			// SE ID 25014: 0x38F9A0 — AE ID 25541: 0x3E82A0 (1.6.1179) — hook at +0xE2
 			// VR: 0x3B8720 confirmed but function is only 66 bytes; hook at +0xE2 cannot work
-			constexpr auto CreateDialogueItem = REL::VariantID(25541, 25541, 0x3B8720);
+			constexpr auto CreateDialogueItem = REL::VariantID(25014, 25541, 0x3B8720);
 		}
 	}
 }
