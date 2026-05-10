@@ -63,31 +63,47 @@ Multiple files are supported — each mod can ship its own without conflict.
 ## Building
 
 ### Requirements
-- CMake
-- VCPKG
-- Visual Studio with desktop C++ development workload
+
+- **Visual Studio Build Tools 2022 or later** with the **Desktop development with C++** workload
+  - Includes MSVC compiler, Ninja, and CMake (bundled)
+  - Available at https://visualstudio.microsoft.com/downloads/ under "Tools for Visual Studio"
+- **vcpkg** cloned to `C:\vcpkg` and bootstrapped
+  - `git clone https://github.com/microsoft/vcpkg C:\vcpkg`
+  - `C:\vcpkg\bootstrap-vcpkg.bat`
+
+> **Note on vcpkg location:** The `C:\vcpkg` path is conventional and keeps package install paths short, avoiding Windows' 260-character path limit. If you have long paths enabled (`LongPathsEnabled = 1` in the registry), you may install vcpkg elsewhere.
 
 ### Instructions
+
+Open an **x64 Native Tools Command Prompt for VS** (found in the Start menu after installing Build Tools), then:
 
 ```
 git clone https://github.com/AirWolf359/ConsiderateFollowers-NG
 cd ConsiderateFollowers-NG
-git submodule init
-git submodule update --recursive
-cmake --preset vs2022-windows-vcpkg-release
-cmake --build build --config Release
+git submodule update --init --recursive
+cmake --preset build-release-msvc
+cmake --build --preset release-msvc
 ```
 
-For VR (currently non-functional at runtime):
-```
-cmake --preset vs2022-windows-vcpkg-vr-release
-cmake --build build-vr --config Release
-```
+vcpkg will download and build all dependencies on first run. This takes several minutes. Subsequent builds are fast.
+
+The output DLL and PDB are placed in `build\release-msvc\`.
 
 ### Automatic deployment to MO2
-Define an environment variable named `SKYRIM_MODS_FOLDER` pointing to your MO2 mods folder. CMake will deploy the built plugin there automatically. Refresh MO2 and enable the mod after building.
+
+Define a user environment variable named `SKYRIM_MODS_FOLDER` pointing to your MO2 mods folder. CMake will copy the built DLL and PDB there automatically after each build.
+
+### Cleaning up
+
+To stop developing this project and remove build artifacts from your system:
+
+1. **Build output** — delete the `build\` folder in the project directory.
+2. **vcpkg package cache** — delete `C:\vcpkg\packages\` and `C:\vcpkg\installed\` to reclaim disk space. The vcpkg toolchain itself (`C:\vcpkg\`) can be deleted entirely if no other projects use it.
+3. **vcpkg binary cache** — located at `%LOCALAPPDATA%\vcpkg\archives\` by default. Safe to delete.
+4. **Visual Studio Build Tools** — uninstall via the Visual Studio Installer or Windows Settings → Apps.
+5. **Environment variables** — remove `VCPKG_ROOT` and `SKYRIM_MODS_FOLDER` from your user environment variables if set.
 
 ## Credits
 
 - [SeaSparrow](https://github.com/SeaSparrowOG) — original Considerate Followers
-- [CharmedBaryon](https://github.com/CharmedBaryon) — CommonLibSSE-NG
+- [alandtse](https://github.com/alandtse) — CommonLibVR (CommonLibSSE-NG fork used by this project)

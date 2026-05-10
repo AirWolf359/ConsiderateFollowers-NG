@@ -3,16 +3,20 @@
   "name": "consideratefollowers",
   "version-semver": "1.0.0",
   "dependencies": [
-    "fmt",
-    "spdlog",
+    { "name": "directxmath", "version>=": "2025-04-03" },
+    { "name": "directxtk", "version>=": "2025-10-27" },
+    { "name": "fmt", "version>=": "12.1.0" },
     "jsoncpp",
-    "simpleini"
+    { "name": "rapidcsv", "version>=": "8.90" },
+    "simpleini",
+    { "name": "spdlog", "version>=": "1.16.0" },
+    { "name": "xbyak", "version>=": "7.28" }
   ],
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
       "repository": "https://github.com/microsoft/vcpkg",
-      "baseline": "c591ac6466a55ef0a05a3d56bb1489ca36e50102"
+      "baseline": "ee12231b20c95013c6638d845d04c91559a1d1ff"
     }
   }
 }

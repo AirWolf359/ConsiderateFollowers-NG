@@ -170,13 +170,13 @@ namespace DialogueManager
 			return;
 		}
 
-		auto* interface = SKSE::GetTaskInterface();
+		auto* taskInterface = SKSE::GetTaskInterface();
 		auto* tasklet = reinterpret_cast<::TaskDelegate*>(this);
-		if (!interface || !tasklet) {
+		if (!taskInterface || !tasklet) {
 			return;
 		}
 		queued = true;
-		interface->AddTask(tasklet);
+		taskInterface->AddTask(tasklet);
 	}
 
 	bool Manager::IsAnyFollowerSpeaking(RE::Actor* a_excluded) const {

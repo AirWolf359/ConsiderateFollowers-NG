@@ -30,6 +30,20 @@ source_group(
 )
 
 set(BUILD_TESTS OFF)
+
+# spdlog's cmake version file has a bug: PACKAGE_FIND_VERSION_MAJOR STREQUAL CVF_VERSION_MAJOR
+# returns FALSE when no version is requested (PACKAGE_FIND_VERSION_MAJOR is ""). Patch it.
+set(_spdlog_ver_file
+    "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows-skse/share/spdlog/spdlogConfigVersion.cmake")
+if(EXISTS "${_spdlog_ver_file}")
+    file(READ "${_spdlog_ver_file}" _spdlog_ver_content)
+    string(REPLACE
+        "if(PACKAGE_FIND_VERSION_MAJOR STREQUAL CVF_VERSION_MAJOR)"
+        "if(PACKAGE_FIND_VERSION_MAJOR STREQUAL \"\" OR PACKAGE_FIND_VERSION_MAJOR STREQUAL CVF_VERSION_MAJOR)"
+        _spdlog_ver_content "${_spdlog_ver_content}")
+    file(WRITE "${_spdlog_ver_file}" "${_spdlog_ver_content}")
+endif()
+
 add_subdirectory(extern/CommonLibSSE-NG)
 include(extern/CommonLibSSE-NG/cmake/CommonLibSSE.cmake)
 
@@ -41,6 +55,13 @@ add_commonlibsse_plugin(
 
 find_path(SIMPLEINI_INCLUDE_DIRS "SimpleIni.h")
 find_package(jsoncpp CONFIG REQUIRED)
+
+target_compile_definitions(
+	"${PROJECT_NAME}"
+	PRIVATE
+		NOMINMAX
+		WIN32_LEAN_AND_MEAN
+)
 
 target_include_directories(
 	"${PROJECT_NAME}"
