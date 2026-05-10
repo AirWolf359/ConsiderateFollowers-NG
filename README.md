@@ -24,13 +24,13 @@ This version also suppresses follower idle dialogue when another follower is alr
 
 | Version | Status |
 |---|---|
-| Skyrim SE 1.5.97 | Not supported (blocked by version check) |
+| Skyrim SE 1.5.97 | Not tested — address library IDs are valid, hook compatibility at `+0xE2` unverified |
 | Skyrim AE 1.6.1130+ | Supported |
 | Skyrim VR 1.4.15 | Not yet supported — see below |
 
 ## VR Support
 
-VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. This ID is absent from the VR address library CSV, and the correct raw memory offset for this function in `SkyrimVR.exe` has not been determined.
+VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. The function address has been located in the VR binary, but the hook point cannot be used.
 
 **What is known:**
 - Five of the six required VR function addresses have been sourced from the [VR address library CSV](https://github.com/alandtse/skyrim_vr_address_library) and confirmed as valid function starts in Ghidra. One (`AIProcess::ProcessGreet`, ID 39162) maps to a mid-function address and still needs runtime verification.

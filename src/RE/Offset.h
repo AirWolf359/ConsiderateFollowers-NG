@@ -28,7 +28,8 @@ namespace RE
 
 		namespace TESTopic
 		{
-			// VR: function confirmed at 0x3B8720 but is only 66 bytes — hook at +0xE2 cannot work, needs alternate strategy
+			// SE: 0x3A8BB0, AE 1.6.1179: 0x3E82A0 — hook at +0xE2 targets the DialogueItem ctor call
+			// VR: 0x3B8720 confirmed but function is only 66 bytes; hook at +0xE2 cannot work
 			constexpr auto CreateDialogueItem = REL::VariantID(25541, 25541, 0x3B8720);
 		}
 	}
