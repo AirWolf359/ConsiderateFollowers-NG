@@ -2,110 +2,44 @@
 #include "Settings/INISettings.h"
 #include "Settings/JSONSettings.h"
 
-// The magical comment of "I Cannot be bothered for an empty commit"
-// It magically changes when I want to trigger a build action!
-
 namespace
 {
 	void InitializeLog()
 	{
 		auto path = logger::log_directory();
 		if (!path) {
-			util::report_and_fail("Failed to find standard logging directory"sv);
+			SKSE::stl::report_and_fail("Failed to find standard logging directory"sv);
 		}
 
 		*path /= fmt::format("{}.log"sv, Plugin::NAME);
 		auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
-
-#ifndef NDEBUG
-		const auto level = spdlog::level::debug;
-#else 
-		const auto level = spdlog::level::info;
-#endif
-
 		auto log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
-		log->set_level(level);
-		log->flush_on(level);
-
+		log->set_level(spdlog::level::info);
+		log->flush_on(spdlog::level::info);
 		spdlog::set_default_logger(std::move(log));
 		spdlog::set_pattern("[%^%l%$] %v"s);
 	}
-}
 
-extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
+	void MessageEventCallback(SKSE::MessagingInterface::Message* a_msg)
 	{
-		SKSE::PluginVersionData v{};
-
-		v.PluginVersion(Plugin::VERSION);
-		v.PluginName(Plugin::NAME);
-		v.AuthorName("SeaSparrow"sv);
-		v.UsesAddressLibrary();
-		v.UsesStructsPost629();
-
-		return v;
-	}();
-
-extern "C" DLLEXPORT bool SKSEAPI
-SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
-{
-	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = Plugin::NAME.data();
-	a_info->version = Plugin::VERSION[0];
-
-	if (a_skse->IsEditor()) {
-		return false;
-	}
-
-	const auto ver = a_skse->RuntimeVersion();
-#ifdef SKYRIMVR
-	if (ver < SKSE::RUNTIME_VR_1_4_15) {
-		return false;
-	}
-#else
-	if (ver < REL::Version(1, 6, 1130, 0)) { // no named constant in CommonLibSSE-NG; RUNTIME_SSE_1_6_1330 appears bugged (value is 1.5.1330)
-		return false;
-	}
-#endif
-
-	return true;
-}
-
-static void MessageEventCallback(SKSE::MessagingInterface::Message* a_msg)
-{
-	switch (a_msg->type) {
-	case SKSE::MessagingInterface::kDataLoaded:
-		if (!Settings::JSON::Holder::GetSingleton()->Read()) {
-			SKSE::stl::report_and_fail("Failed to read JSON settings."sv);
+		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
+			if (!Settings::JSON::Holder::GetSingleton()->Read()) {
+				SKSE::stl::report_and_fail("Failed to read JSON settings."sv);
+			}
+			logger::info("Startup tasks finished, enjoy your game!");
 		}
-		logger::info("==========================================================");
-		logger::info("Startup tasks finished, enjoy your game!");
-		break;
-	default:
-		break;
 	}
 }
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 {
 	InitializeLog();
-	logger::info("=================================================");
-	logger::info("{} v{}"sv, Plugin::NAME, Plugin::VERSION.string());
-	logger::info("Author: SeaSparrow"sv);
-	logger::info("=================================================");
+
+	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
+	logger::info("{} v{} loading...", plugin->GetName(), plugin->GetVersion());
+
 	SKSE::Init(a_skse);
 
-	const auto ver = a_skse->RuntimeVersion();
-#ifdef SKYRIMVR
-	if (ver < SKSE::RUNTIME_VR_1_4_15) {
-		return false;
-	}
-#else
-	if (ver < REL::Version(1, 6, 1130, 0)) { // no named constant in CommonLibSSE-NG; RUNTIME_SSE_1_6_1330 is bugged (value is 1.5.1330)
-		return false;
-	}
-#endif
-
-	logger::info("Performing startup tasks..."sv);
 	if (!Settings::INI::Holder::GetSingleton()->Read()) {
 		SKSE::stl::report_and_fail("Failed to read INI settings."sv);
 	}
@@ -113,8 +47,8 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 		SKSE::stl::report_and_fail("Failed to install necessary hooks."sv);
 	}
 
-	const auto messaging = SKSE::GetMessagingInterface();
-	messaging->RegisterListener(&MessageEventCallback);
+	SKSE::GetMessagingInterface()->RegisterListener(&MessageEventCallback);
 
+	logger::info("{} loaded.", plugin->GetName());
 	return true;
 }
