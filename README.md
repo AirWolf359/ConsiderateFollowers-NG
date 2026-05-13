@@ -16,29 +16,19 @@ This version also suppresses follower idle dialogue when another follower is alr
 ### Bug fixes
 - Fixed a crash on first install when the JSON config folder was not present
 - Fixed AE compatibility: the plugin now correctly identifies itself as compatible with post-1.6.629 struct layouts, resolving a version mismatch error on launch
+- Fixed a crash during cell transitions when followers are present: `ForAllActors` could yield actors whose 3D data had not yet finished loading, causing an access violation when reading actor state
 
-### Library
-- Uses CommonLibSSE-NG instead of the original CommonLibSSE fork, enabling a single codebase to target SE, AE, and (eventually) VR
+### Architecture
+- Uses CommonLibSSE-NG instead of the original CommonLibSSE fork, enabling a single codebase to target SE, AE, and VR
+- Follower speaking state (`IsAnyFollowerSpeaking`, `IsTalking`) is now computed once per player update tick on the main game thread and cached atomically, rather than being evaluated inside the dialogue creation callback. This eliminates a class of race conditions that manifested as crashes in VR (where dialogue creation is dispatched from BSJobs worker threads) and makes the checks safer across all runtimes.
 
 ## Compatibility
 
 | Version | Status |
 |---|---|
-| Skyrim SE 1.5.97 | Not tested — address library IDs are valid, hook compatibility at `+0xE2` unverified |
+| Skyrim SE 1.5.97 | Supported |
 | Skyrim AE 1.6.1130+ | Supported |
-| Skyrim VR 1.4.15 | Not yet supported — see below |
-
-## VR Support
-
-VR support is the primary goal of the CommonLibSSE-NG migration, but is currently blocked. The mod hooks into `TESTopic::CreateDialogueItem` (SKSE address library ID 25541) to intercept follower dialogue at the point of creation. **ID 25541 is absent from the VR address library CSV**, so there is no library-provided mapping for this function in VR.
-
-**What is known:**
-- Five of the six required VR function addresses have been sourced from the [VR address library CSV](https://github.com/alandtse/skyrim_vr_address_library) and confirmed as valid function starts in Ghidra. One (`AIProcess::ProcessGreet`, ID 39162) maps to a mid-function address and still needs runtime verification.
-- A candidate address for `CreateDialogueItem` in `SkyrimVR.exe` (`0x3B8720`) was located by searching the binary directly, but the function at that address is only 66 bytes — far too short to contain the hook point used in SE/AE (`+0xE2`).
-- The SE/AE hook patches a `CALL` instruction at `CreateDialogueItem + 0xE2`. In VR, the equivalent `CALL` to the `DialogueItem` constructor either occurs at a different offset or has been compiled away entirely. The VR version of this function appears to be structured very differently from SE/AE.
-
-**What is needed:**
-Runtime debugging (e.g. x64dbg attached to a live `SkyrimVR.exe` process) to find where the `DialogueItem` constructor is called in the VR version of `CreateDialogueItem`, and to verify the `AIProcess::ProcessGreet` address. If you have experience with VR binary analysis or know where this information can be found, please open an issue or get in touch.
+| Skyrim VR 1.4.15 | Supported (experimental) |
 
 ## INI Settings
 

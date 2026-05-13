@@ -85,7 +85,7 @@ namespace DialogueManager
 			closestSpeakerID = a_speaker->GetFormID();
 			return;
 		}
-		else if (!oldSpeaker->Is3DLoaded() || !RE::IsTalking(oldSpeaker)) {
+		else if (!oldSpeaker->Is3DLoaded() || !m_closestSpeakerTalking) {
 			closestSpeakerID = a_speaker->GetFormID();
 			return;
 		}
@@ -179,30 +179,40 @@ namespace DialogueManager
 		taskInterface->AddTask(tasklet);
 	}
 
-	bool Manager::IsAnyFollowerSpeaking(RE::Actor* a_excluded) const {
+	void Manager::RefreshCachedState() {
+		// Runs on the main game thread via PlayerUpdateListener.
+		// Caches state that is unsafe to query from VR job threads.
+
+		auto* closestSpeaker = closestSpeakerID ? RE::TESForm::LookupByID<RE::Character>(closestSpeakerID) : nullptr;
+		m_closestSpeakerTalking = closestSpeaker && closestSpeaker->Is3DLoaded() && RE::IsTalking(closestSpeaker);
+
 		auto* processList = RE::ProcessLists::GetSingleton();
 		auto* player = RE::PlayerCharacter::GetSingleton();
 		if (!processList || !player) {
-			return false;
+			m_speakingFollowerID = 0;
+			return;
 		}
 
-		bool found = false;
+		RE::FormID speakingID = 0;
 		processList->ForAllActors([&](RE::Actor* actor) {
-			if (!actor || !actor->Is3DLoaded()) {
-				return RE::BSContainer::ForEachResult::kContinue;
-			}
-			if (actor == a_excluded || !actor->IsPlayerTeammate()) {
+			if (!actor || !actor->Is3DLoaded() || !actor->IsPlayerTeammate()) {
 				return RE::BSContainer::ForEachResult::kContinue;
 			}
 			auto* character = actor->As<RE::Character>();
 			if (character && RE::IsTalking(character) &&
 				actor->GetPosition().GetDistance(player->GetPosition()) <= maximumDistance) {
-				found = true;
+				speakingID = actor->GetFormID();
 				return RE::BSContainer::ForEachResult::kStop;
 			}
 			return RE::BSContainer::ForEachResult::kContinue;
 		});
-		return found;
+		m_speakingFollowerID = speakingID;
+	}
+
+	bool Manager::IsAnyFollowerSpeaking(RE::Actor* a_excluded) const {
+		RE::FormID speakingID = m_speakingFollowerID.load();
+		if (speakingID == 0) return false;
+		return !a_excluded || a_excluded->GetFormID() != speakingID;
 	}
 
 	bool Manager::IsClosestActorSpeaking() const {
