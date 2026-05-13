@@ -30,6 +30,16 @@ This version also suppresses follower idle dialogue when another follower is alr
 | Skyrim AE 1.6.1130+ | Supported |
 | Skyrim VR 1.4.15 | Supported (experimental) |
 
+## Known Limitations
+
+### Follower-to-follower blocking does not apply to scene dialogue
+
+The follower-to-follower blocking feature suppresses standard idle dialogue (`kIdle` subtype) when another follower is already speaking. However, dialogue delivered via the scene system (`kSceneDialogue` type) is intentionally exempt — scene dialogue is also used for story-critical scripted sequences that should never be suppressed.
+
+Many high-quality follower mods (including Auri – Song of the Green and Inigo) deliver their commentary and banter through scenes rather than standard idle dialogue. For these followers, the blocking feature will have no effect. There is no reliable way to distinguish scripted story scenes from mod follower banter by dialogue type alone, so this is a fundamental limitation rather than a bug.
+
+The primary feature — suppressing all follower idle dialogue while the player is in conversation — is not affected by this limitation.
+
 ## INI Settings
 
 Located at `Data\SKSE\Plugins\ConsiderateFollowers.ini`.
