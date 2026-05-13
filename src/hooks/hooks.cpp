@@ -36,7 +36,7 @@ namespace Hooks {
 	{
 		auto& trampoline = SKSE::GetTrampoline();
 
-		REL::Relocation<std::uintptr_t> target{ RE::Offset::TESTopic::CreateDialogueItem, REL::VariantOffset(0xE2, 0xE2, 0) };
+		REL::Relocation<std::uintptr_t> target{ RE::Offset::TESTopic::CreateDialogueItem, REL::VariantOffset(0xE2, 0xE2, 0xE2) };
 		if (!REL::make_pattern<"E8">().match(target.address())) {
 			logger::critical("  >Failed to match E8 pattern at CreateDialogueItem + 0xE2."sv);
 			return false;

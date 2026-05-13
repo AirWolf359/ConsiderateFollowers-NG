@@ -188,6 +188,9 @@ namespace DialogueManager
 
 		bool found = false;
 		processList->ForAllActors([&](RE::Actor* actor) {
+			if (!actor || !actor->Is3DLoaded()) {
+				return RE::BSContainer::ForEachResult::kContinue;
+			}
 			if (actor == a_excluded || !actor->IsPlayerTeammate()) {
 				return RE::BSContainer::ForEachResult::kContinue;
 			}
