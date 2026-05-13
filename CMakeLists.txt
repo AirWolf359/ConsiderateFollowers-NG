@@ -63,6 +63,14 @@ target_compile_definitions(
 		WIN32_LEAN_AND_MEAN
 )
 
+if(MSVC)
+	target_compile_options(
+		"${PROJECT_NAME}"
+		PRIVATE
+			"/d1trimfile:${CMAKE_SOURCE_DIR}/"
+	)
+endif()
+
 target_include_directories(
 	"${PROJECT_NAME}"
 	PRIVATE
