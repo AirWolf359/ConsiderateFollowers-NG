@@ -57,6 +57,7 @@ namespace Hooks {
 		if (internalCounter >= timeBetweenAttempts) {
 			auto* manager = DialogueManager::Manager::GetSingleton();
 			if (manager) {
+				manager->RefreshCachedState();
 				manager->QueueTask();
 			}
 			internalCounter = 0.0f;
