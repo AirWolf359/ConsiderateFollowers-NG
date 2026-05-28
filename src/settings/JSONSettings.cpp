@@ -234,6 +234,7 @@ namespace Settings::JSON
 				return true;
 			}
 			DialogueManager::Manager::GetSingleton()->RegisterWhitelistedNPCs(configNPCs);
+			return true;
 		}
 		logger::warn("    >Config does not have a {} field. This is likely an error with the config."sv, WHITELIST_FIELD);
 		return false;

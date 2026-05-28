@@ -58,6 +58,22 @@ Mod authors can exempt specific NPCs from suppression by placing a `.json` file 
 }
 ```
 
+Each entry in the `Whitelist` array is a string in one of two formats:
+
+- `"PluginName.esp|0x123456"` — identifies an NPC by plugin name and local form ID (hexadecimal, `0x` prefix required)
+- `"EditorID"` — identifies an NPC by editor ID
+
+The `Whitelist` value may also be a single string instead of an array if only one NPC is being whitelisted.
+
+An optional `MinimumVersion` field (integer) can be specified to require a minimum parser version. If the installed version of the mod is older than the value specified, the config file will be ignored. Currently only version `1` exists, so this field is most useful for future-proofing.
+
+```json
+{
+    "MinimumVersion": 1,
+    "Whitelist": ["MyMod.esp|0x123456", "MyFollowerEditorID"]
+}
+```
+
 Multiple files are supported — each mod can ship its own without conflict.
 
 ## Building
