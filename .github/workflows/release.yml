@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VCPKG_ROOT: C:\vcpkg
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
+
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup MSVC environment
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+            -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+            -property installationPath
+          & cmd /s /c "`"$vsPath\Common7\Tools\VsDevCmd.bat`" -arch=x64 -host_arch=x64 -no_logo && set" |
+            ForEach-Object {
+              $name, $value = $_ -split '=', 2
+              if ($name -and $value) {
+                Add-Content -Path $env:GITHUB_ENV -Value "$name=$value"
+              }
+            }
+
+      - name: Setup vcpkg
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "${{ env.VCPKG_DEFAULT_BINARY_CACHE }}" | Out-Null
+          cd $env:VCPKG_INSTALLATION_ROOT
+          ./bootstrap-vcpkg.bat
+          ./vcpkg --version > "${{ github.workspace }}/vcpkg-version.txt"
+
+      - name: Cache vcpkg binaries
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}/*
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-version.txt') }}
+
+      - name: Configure
+        run: cmake --preset build-release-msvc
+
+      - name: Build
+        run: cmake --build --preset release-msvc
+
+      - name: Package mod archive
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          New-Item -ItemType Directory -Force stage/SKSE/Plugins | Out-Null
+          Copy-Item "build/release-msvc/ConsiderateFollowers.dll" stage/SKSE/Plugins/
+          Copy-Item "data/SKSE/Plugins/ConsiderateFollowers.ini" stage/SKSE/Plugins/
+          Compress-Archive -Path stage/* -DestinationPath "ConsiderateFollowers-NG-$version.zip"
+          Compress-Archive -Path "build/release-msvc/ConsiderateFollowers.pdb" -DestinationPath "ConsiderateFollowers-NG-$version-pdb.zip"
+
+      - name: Create GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ github.ref_name }}"
+          gh release create $version `
+            "ConsiderateFollowers-NG-$version.zip#Mod archive (install with a mod manager)" `
+            "ConsiderateFollowers-NG-$version-pdb.zip#Debug symbols (for crash log symbolication)" `
+            --title "Considerate Followers NG $version" `
+            --generate-notes
