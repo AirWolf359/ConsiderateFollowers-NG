@@ -5,6 +5,11 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and attach assets to (e.g. v1.2.0)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -15,12 +20,20 @@ env:
 
 jobs:
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    # Only ever run against a version tag — either pushed, or named explicitly
+    # via workflow_dispatch. A dispatch with no tag would otherwise build the
+    # branch and create a release named after it.
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.tag != '')
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          # On a tag push this is the tag itself; on a dispatch it is the tag
+          # named in the input, so the build always matches the release.
+          ref: ${{ inputs.tag || github.ref_name }}
           submodules: recursive
 
       - name: Setup MSVC environment
@@ -60,21 +73,30 @@ jobs:
       - name: Package mod archive
         shell: pwsh
         run: |
-          $version = "${{ github.ref_name }}"
+          $version = "${{ inputs.tag || github.ref_name }}"
           New-Item -ItemType Directory -Force stage/SKSE/Plugins | Out-Null
           Copy-Item "build/release-msvc/ConsiderateFollowers.dll" stage/SKSE/Plugins/
           Copy-Item "data/SKSE/Plugins/ConsiderateFollowers.ini" stage/SKSE/Plugins/
           Compress-Archive -Path stage/* -DestinationPath "ConsiderateFollowers-NG-$version.zip"
           Compress-Archive -Path "build/release-msvc/ConsiderateFollowers.pdb" -DestinationPath "ConsiderateFollowers-NG-$version-pdb.zip"
 
-      - name: Create GitHub Release
+      - name: Create or update GitHub Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $version = "${{ github.ref_name }}"
-          gh release create $version `
-            "ConsiderateFollowers-NG-$version.zip#Mod archive (install with a mod manager)" `
-            "ConsiderateFollowers-NG-$version-pdb.zip#Debug symbols (for crash log symbolication)" `
-            --title "Considerate Followers NG $version" `
-            --generate-notes
+          $version = "${{ inputs.tag || github.ref_name }}"
+          $archive = "ConsiderateFollowers-NG-$version.zip#Mod archive (install with a mod manager)"
+          $symbols = "ConsiderateFollowers-NG-$version-pdb.zip#Debug symbols (for crash log symbolication)"
+
+          # The tag may already have a release attached — publishing from the
+          # GitHub UI creates the tag that triggers this run. Attach the built
+          # assets in that case rather than failing on "already exists".
+          gh release view $version *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release $version already exists - uploading assets."
+            gh release upload $version $archive $symbols --clobber
+          } else {
+            Write-Host "Creating release $version."
+            gh release create $version $archive $symbols --title "Considerate Followers NG $version" --generate-notes
+          }
